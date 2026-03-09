@@ -40,7 +40,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(self.style.WARNING(f"{obj.key} configuration already exists"))
 
-        keys = ["IS_GOOGLE_ENABLED", "IS_GITHUB_ENABLED", "IS_GITLAB_ENABLED", "IS_GITEA_ENABLED"]
+        keys = ["IS_GOOGLE_ENABLED", "IS_GITHUB_ENABLED", "IS_GITLAB_ENABLED", "IS_GITEA_ENABLED", "IS_KEYCLOAK_ENABLED"]
         if not InstanceConfiguration.objects.filter(key__in=keys).exists():
             for key in keys:
                 if key == "IS_GOOGLE_ENABLED":
@@ -142,6 +142,38 @@ class Command(BaseCommand):
                         value = "0"
                     InstanceConfiguration.objects.create(
                         key="IS_GITEA_ENABLED",
+                        value=value,
+                        category="AUTHENTICATION",
+                        is_encrypted=False,
+                    )
+                    self.stdout.write(self.style.SUCCESS(f"{key} loaded with value from environment variable."))
+                if key == "IS_KEYCLOAK_ENABLED":
+                    KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET = get_configuration_value(
+                        [
+                            {
+                                "key": "KEYCLOAK_SERVER_URL",
+                                "default": os.environ.get("KEYCLOAK_SERVER_URL", ""),
+                            },
+                            {
+                                "key": "KEYCLOAK_REALM",
+                                "default": os.environ.get("KEYCLOAK_REALM", ""),
+                            },
+                            {
+                                "key": "KEYCLOAK_CLIENT_ID",
+                                "default": os.environ.get("KEYCLOAK_CLIENT_ID", ""),
+                            },
+                            {
+                                "key": "KEYCLOAK_CLIENT_SECRET",
+                                "default": os.environ.get("KEYCLOAK_CLIENT_SECRET", ""),
+                            },
+                        ]
+                    )
+                    if bool(KEYCLOAK_SERVER_URL) and bool(KEYCLOAK_REALM) and bool(KEYCLOAK_CLIENT_ID) and bool(KEYCLOAK_CLIENT_SECRET):
+                        value = "1"
+                    else:
+                        value = "0"
+                    InstanceConfiguration.objects.create(
+                        key="IS_KEYCLOAK_ENABLED",
                         value=value,
                         category="AUTHENTICATION",
                         is_encrypted=False,
