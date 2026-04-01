@@ -47,6 +47,7 @@ export function InstanceKeycloakConfigForm(props: Props) {
       KEYCLOAK_REALM: config["KEYCLOAK_REALM"] || "",
       KEYCLOAK_CLIENT_ID: config["KEYCLOAK_CLIENT_ID"] || "",
       KEYCLOAK_CLIENT_SECRET: config["KEYCLOAK_CLIENT_SECRET"] || "",
+      KEYCLOAK_REQUIRED_ROLE: config["KEYCLOAK_REQUIRED_ROLE"] || "",
     },
   });
 
@@ -89,6 +90,20 @@ export function InstanceKeycloakConfigForm(props: Props) {
       error: Boolean(errors.KEYCLOAK_CLIENT_SECRET),
       required: true,
     },
+    {
+      key: "KEYCLOAK_REQUIRED_ROLE",
+      type: "text",
+      label: "Required role",
+      description: (
+        <>
+          Optional. If set, only Keycloak users with this realm role will be allowed to sign in. Leave empty to allow
+          all authenticated users.
+        </>
+      ),
+      placeholder: "plane-access",
+      error: Boolean(errors.KEYCLOAK_REQUIRED_ROLE),
+      required: false,
+    },
   ];
 
   const KEYCLOAK_SERVICE_FIELD: TCopyField[] = [
@@ -120,6 +135,7 @@ export function InstanceKeycloakConfigForm(props: Props) {
         KEYCLOAK_REALM: response.find((item) => item.key === "KEYCLOAK_REALM")?.value,
         KEYCLOAK_CLIENT_ID: response.find((item) => item.key === "KEYCLOAK_CLIENT_ID")?.value,
         KEYCLOAK_CLIENT_SECRET: response.find((item) => item.key === "KEYCLOAK_CLIENT_SECRET")?.value,
+        KEYCLOAK_REQUIRED_ROLE: response.find((item) => item.key === "KEYCLOAK_REQUIRED_ROLE")?.value,
       });
     } catch (err) {
       console.error(err);

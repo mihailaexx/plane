@@ -78,6 +78,8 @@ export enum EAuthenticationErrorCodes {
   GOOGLE_OAUTH_PROVIDER_ERROR = "5115",
   GITHUB_OAUTH_PROVIDER_ERROR = "5120",
   GITLAB_OAUTH_PROVIDER_ERROR = "5121",
+  KEYCLOAK_OAUTH_PROVIDER_ERROR = "5124",
+  KEYCLOAK_ROLE_NOT_GRANTED = "5126",
   // Reset Password
   INVALID_PASSWORD_TOKEN = "5125",
   EXPIRED_PASSWORD_TOKEN = "5130",
@@ -282,6 +284,14 @@ const errorCodeMessages: {
     title: `GitLab OAuth provider error`,
     message: () => `GitLab OAuth provider error. Please try again.`,
   },
+  [EAuthenticationErrorCodes.KEYCLOAK_OAUTH_PROVIDER_ERROR]: {
+    title: `Keycloak OAuth provider error`,
+    message: () => `Keycloak OAuth provider error. Please try again.`,
+  },
+  [EAuthenticationErrorCodes.KEYCLOAK_ROLE_NOT_GRANTED]: {
+    title: `Access denied`,
+    message: () => `You do not have the required role to access this application. Please contact your administrator.`,
+  },
 
   // Reset Password
   [EAuthenticationErrorCodes.INVALID_PASSWORD_TOKEN]: {
@@ -408,6 +418,8 @@ export const authErrorHandler = (errorCode: EAuthenticationErrorCodes, email?: s
     EAuthenticationErrorCodes.GOOGLE_OAUTH_PROVIDER_ERROR,
     EAuthenticationErrorCodes.GITHUB_OAUTH_PROVIDER_ERROR,
     EAuthenticationErrorCodes.GITLAB_OAUTH_PROVIDER_ERROR,
+    EAuthenticationErrorCodes.KEYCLOAK_OAUTH_PROVIDER_ERROR,
+    EAuthenticationErrorCodes.KEYCLOAK_ROLE_NOT_GRANTED,
     EAuthenticationErrorCodes.INVALID_PASSWORD_TOKEN,
     EAuthenticationErrorCodes.EXPIRED_PASSWORD_TOKEN,
     EAuthenticationErrorCodes.INCORRECT_OLD_PASSWORD,

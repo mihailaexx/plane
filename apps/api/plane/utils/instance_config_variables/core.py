@@ -175,6 +175,12 @@ keycloak_config_variables = [
         "category": "KEYCLOAK",
         "is_encrypted": True,
     },
+    {
+        "key": "KEYCLOAK_REQUIRED_ROLE",
+        "value": os.environ.get("KEYCLOAK_REQUIRED_ROLE", ""),
+        "category": "KEYCLOAK",
+        "is_encrypted": False,
+    },
 ]
 
 smtp_config_variables = [

@@ -62,7 +62,8 @@ export type TInstanceKeycloakAuthenticationConfigurationKeys =
   | "KEYCLOAK_SERVER_URL"
   | "KEYCLOAK_REALM"
   | "KEYCLOAK_CLIENT_ID"
-  | "KEYCLOAK_CLIENT_SECRET";
+  | "KEYCLOAK_CLIENT_SECRET"
+  | "KEYCLOAK_REQUIRED_ROLE";
 
 export type TInstanceAuthenticationConfigurationKeys =
   | TInstanceGoogleAuthenticationConfigurationKeys

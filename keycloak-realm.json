@@ -6,6 +6,14 @@
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "verifyEmail": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "plane-access",
+        "description": "Grants access to the Plane application"
+      }
+    ]
+  },
   "clients": [
     {
       "clientId": "plane",
@@ -14,15 +22,25 @@
       "publicClient": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "Nzn7qbYgHyJ7frSWJEU6JLF8yeXUIPOS",
-      "redirectUris": [
-        "http://localhost:8000/auth/keycloak/callback/"
-      ],
-      "webOrigins": [
-        "http://localhost:8000"
-      ],
+      "redirectUris": ["http://localhost:8000/auth/keycloak/callback/"],
+      "webOrigins": ["http://localhost:8000"],
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false
+      "serviceAccountsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "true"
+          }
+        }
+      ]
     }
   ],
   "users": [
@@ -33,6 +51,7 @@
       "enabled": true,
       "firstName": "Test",
       "lastName": "User",
+      "realmRoles": ["plane-access"],
       "credentials": [
         {
           "type": "password",

@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
+import base64
+import json
 import os
 from datetime import datetime
 from urllib.parse import urlencode, urlparse
@@ -135,6 +137,49 @@ class KeycloakOAuthProvider(OauthAdapter):
             }
         )
 
+    @staticmethod
+    def _decode_id_token_claims(id_token):
+        """Decode JWT payload without signature verification.
+        The token was just received from Keycloak over TLS so
+        cryptographic verification is unnecessary here."""
+        try:
+            payload_segment = id_token.split(".")[1]
+            # Add padding if needed
+            padding = 4 - len(payload_segment) % 4
+            if padding != 4:
+                payload_segment += "=" * padding
+            return json.loads(base64.urlsafe_b64decode(payload_segment))
+        except (IndexError, ValueError, json.JSONDecodeError):
+            return {}
+
+    def _check_required_role(self):
+        """Reject the user if a required Keycloak role is configured
+        and the user's id_token does not contain it."""
+        (KEYCLOAK_REQUIRED_ROLE,) = get_configuration_value(
+            [
+                {
+                    "key": "KEYCLOAK_REQUIRED_ROLE",
+                    "default": os.environ.get("KEYCLOAK_REQUIRED_ROLE", ""),
+                },
+            ]
+        )
+
+        if not KEYCLOAK_REQUIRED_ROLE:
+            return
+
+        claims = self._decode_id_token_claims(
+            self.token_data.get("id_token", "")
+        )
+        realm_roles = claims.get("realm_access", {}).get("roles", [])
+
+        if KEYCLOAK_REQUIRED_ROLE not in realm_roles:
+            raise AuthenticationException(
+                error_code=AUTHENTICATION_ERROR_CODES[
+                    "KEYCLOAK_ROLE_NOT_GRANTED"
+                ],
+                error_message="KEYCLOAK_ROLE_NOT_GRANTED",
+            )
+
     def set_user_data(self):
         """Fetch user info from Keycloak userinfo endpoint."""
         user_info_response = self.get_user_response()
@@ -147,6 +192,9 @@ class KeycloakOAuthProvider(OauthAdapter):
                 ],
                 error_message="KEYCLOAK_OAUTH_PROVIDER_ERROR",
             )
+
+        # Gate: check required role before allowing login
+        self._check_required_role()
 
         super().set_user_data(
             {
